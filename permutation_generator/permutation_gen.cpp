@@ -10,12 +10,18 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <regex>
+#include <bits/stdc++.h>
 
 void findPermutations(std::string str, std::string ans);
 std::string getAccumulated();
 void addArray(std::string str, int n, int i);
+void substringBuilder(std::vector<std::string> arrayString, int x);
+
 
 int main(int argc, char * argv[]){
+
+	return 1;
 
 }
 
@@ -199,8 +205,12 @@ int main(int argc, char * argv[]){
 
 		std::string shortString = S.substr(0,a);
 			
-		std::vector<std::string> arrayString = shortString.substr(0, shortString.find(" "));
-						
+		//std::vector<std::string> arrayString = shortString.substr(0, shortString.find(" "));
+		
+		std::regex re(" ");
+		std::sregex_token_iterator first{shortString.begin(), shortString.end(), re, -1}, last;//the '-1' is what makes the regex split (-1 := what was not matched)
+		std::vector<std::string> arrayString{first, last};
+
 		//for loop skips over repeating substrings, only grabbing unique strings from original list of permutations.
 			
 		for (int i = 1, x = 1; i < arrayString.at(i).size(); i++, x = factorial(i), y = i){
@@ -209,16 +219,17 @@ int main(int argc, char * argv[]){
 						
 		}
 		
-		TestCombo = Build.toString();
+	
+		TestCombo = Build.str();
 		
 	}
 
 
-	void substringBuilder(String[] arrayString, int x){
+	void substringBuilder(std::vector<std::string> arrayString, int x){
 	        
-		for (j = 1; j < arrayString.length; j += x) {
+		for (j = 1; j < arrayString.size(); j += x) {
 			            
-			Build.append(subString(arrayString[j], arrayString[0].length()));
+			Build << subString(arrayString.at(j), arrayString.at(0).size());
 				                			
 			//TODO create an array of strings instead of one long string				    
 			//Substring function is returning to nothing.			
@@ -243,9 +254,9 @@ int main(int argc, char * argv[]){
 			
     		clearStringBuilder();
 
-		permutationsGenerated = new char[LetterFromUser.length * factorial(LetterFromUser.length) + factorial(LetterFromUser.length)];
+		permutationsGenerated.reserve(LetterFromUser.size() * factorial(LetterFromUser.size()) + factorial(LetterFromUser.size()));
 
-		lengthArray = permutationsGenerated.length;
+		lengthArray = permutationsGenerated.size();
 
 
 	}
@@ -256,11 +267,11 @@ int main(int argc, char * argv[]){
 
 	}
 
-	HashSet<String> wordDictionary = new HashSet<>();
+	std::unordered_set <std::string> wordDictionary;
 	     
 	void CreateDictionary() {
 		         	 		             	
-   		if(wordDictionary.isEmpty()) {
+   		if(wordDictionary.empty()) {
 				                 
 			     try {
 
@@ -271,7 +282,7 @@ int main(int argc, char * argv[]){
 
 				     while ((line = sc.next()) != null) {
 
-					     wordDictionary.add(line);
+					     wordDictionary.insert(line);
 					
 				     }
 
@@ -287,7 +298,7 @@ int main(int argc, char * argv[]){
 
 	void getPermutationLength(int length){
 
-		permutationsGenerated = new char[length];
+		permutationsGenerated.reserve(length);
 	
 	}
 	
