@@ -11,19 +11,13 @@
 #include <vector>
 #include <sstream>
 #include <regex>
-#include <bits/stdc++.h>
+#include <unordered_set>
+//#include <bits/stdc++.h>
 
 void findPermutations(std::string str, std::string ans);
 std::string getAccumulated();
 void addArray(std::string str, int n, int i);
 void substringBuilder(std::vector<std::string> arrayString, int x);
-
-
-int main(int argc, char * argv[]){
-
-	return 1;
-
-}
 
 	//serial code converted from java implementation
 
@@ -65,9 +59,7 @@ int main(int argc, char * argv[]){
 	std::vector<char> getLetters(){ return LetterFromUser; }
 								        									    
 	std::string getPermutations() { return TestCombo;}
-									  									        
-	std::vector<char> getString() { return LetterFromUser;}
-	
+									  									  
 	int factorial(int n){
 
 		if (n == 0){
@@ -148,7 +140,7 @@ int main(int argc, char * argv[]){
 	}
 
 	void findPermutations(std::string str, std::string ans){
-     
+     		
 		// If string is empty
 			
        		if (str.size() == 0) {
@@ -270,40 +262,70 @@ int main(int argc, char * argv[]){
 	std::unordered_set <std::string> wordDictionary;
 	     
 	void CreateDictionary() {
-		         	 		             	
-   		if(wordDictionary.empty()) {
+		
+		const int B = 100;		
+   		
+		if(wordDictionary.empty()) {
 				                 
-			     try {
 
-				     File file = new File("C:\\Users\\Steven Carpenter\\eclipse-workspace\\ScrambleAlgorithm\\src\\scramble\\dictionary2.txt");				
-				     Scanner sc = new Scanner(file);											           	 	
-				     sc.useDelimiter("\n");
-				     std::string line;
+				     FILE * file;
+     				     char buffer[B];
 
-				     while ((line = sc.next()) != null) {
+				     file = fopen("./dictionary.txt", "r");
+				     if (file == NULL) perror ("Error opening file");   
+				     else{		        
+					     while( ! feof (file) ){
+			
+				     		if( fgets (buffer , 100 , file) == NULL ) break;	
+				     		wordDictionary.insert(buffer);
+				     
+					     }
 
-					     wordDictionary.insert(line);
-					
-				     }
+				     fclose (file);
 
-			     } catch (IOException e) {
-
-				     e.printStackTrace();
-			     }
-
-		     }
+		     		     }
 
 	     }
-
-
-	void getPermutationLength(int length){
-
-		permutationsGenerated.reserve(length);
-	
 	}
+
 	
 	std::string getAccumulated(){
 		       
-	       	return allCombos;
+	       	return allcombos;
 	
 	}
+
+	std::string getString(){ 
+		
+		std::string S(LetterFromUser.begin(), LetterFromUser.end());
+		return S;
+	
+	}
+
+int main(int argc, char * argv[]){
+
+
+	//finish driver code
+	//then recompile	
+		
+
+	std::vector<char> charArray;
+
+	charArray.push_back('a');
+	charArray.push_back('b');
+	charArray.push_back('c');
+	charArray.push_back('d');
+	charArray.push_back('e');		
+
+	printf("Test1");	
+	takeLetter(charArray);
+	printf("Test2");
+	findPermutations(getString(), " ");
+	findAllSubstrings();
+	
+	printf("%s", TestCombo.c_str());		
+			      
+	return 1;
+			                                                                                                
+}
+
