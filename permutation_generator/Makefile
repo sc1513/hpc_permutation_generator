@@ -34,7 +34,7 @@ CXXFLAGS += -D__DTYPE=$(dtype)
 endif
 endif
 
-EXEC = permutation_gen
+EXEC = permutation_gen2
 
 all: $(EXEC)
 
@@ -42,8 +42,8 @@ include $(COMMON)/Makefile.common
 
 -include *.d
 
-permutation_gen: permutation_gen.o $(COMMON_OBJS)
-	$(CXX) $(CXXFLAGS) -o permutation_gen $^ $(LDFLAGS)
+permutation_gen2: permutation_gen2.o $(COMMON_OBJS)
+	$(CXX) $(CXXFLAGS) -o permutation_gen2 $^ $(LDFLAGS)
 
 clean:
 	/bin/rm -fv $(EXEC) *.o *.optrpt *.d

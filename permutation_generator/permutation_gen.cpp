@@ -12,7 +12,7 @@
 #include <sstream>
 #include <regex>
 #include <unordered_set>
-//#include <bits/stdc++.h>
+#include <bits/stdc++.h>
 
 void findPermutations(std::string str, std::string ans);
 std::string getAccumulated();
@@ -29,7 +29,7 @@ void substringBuilder(std::vector<std::string> arrayString, int x);
 	
 	std::string TestCombo;
 		    
-	std::vector<char> permutationsGenerated;
+	std::stringstream permutationsGenerated;
 		        
 	std::vector<std::string> permutationsChecked;
 			    
@@ -74,8 +74,8 @@ void substringBuilder(std::vector<std::string> arrayString, int x);
 
 	void getPermutationLength(int length){
 
-		std::vector <char> permutationsGenerated;
-		permutationsGenerated.reserve(length);
+		std::stringstream permutationsGenerated;
+		//permutationsGenerated.reserve(length);
 
         }
 
@@ -142,53 +142,27 @@ void substringBuilder(std::vector<std::string> arrayString, int x);
 	void findPermutations(std::string str, std::string ans){
      		
 		// If string is empty
-			
-       		if (str.size() == 0) {
-			
-			for(int k = 0; k < ans.size(); k++){
-			
-				permutationsGenerated[j] = ans.at(k);
-				j = j + 1;
-			}
+		if(str.length() == 0){
+        		permutationsGenerated << ans << "  ";
+        		return;
+    		}
 
-			PermutationCounter++;
-	
-			permutationsGenerated[j] = ' ';
-			
-			j = j + 1;
-			
-		return;
-			
-		}
-	
-		std::vector<bool> alpha;
-		alpha.reserve(26);
-	        
-		for (int i = 0; i < str.size(); i++) {
-	
-		
-			char ch = str.at(i);
-
-			std::string ros = str.substr(0, i) +
-
-			str.substr(i + 1);
-
-			if (!alpha[ch - 'a']){
-			
-				findPermutations(ros, ans + ch);
-
-			}
-			
-			alpha[ch - 'a'] = true;								        
-	
-		}
-
+    		for(int i=0 ; i < str.length() ; i++){
+        		char ch = str[i];
+        		string left_substr = str.substr(0,i);
+        		string right_substr = str.substr(i+1);
+        		string rest = left_substr + right_substr;
+        		findpermutations(rest , ans + ch);
+    		}
 	}
 
 	void findAllSubstrings() {
-					
+		
+		printf("Test5");			
 		std::string S(permutationsGenerated.begin(), permutationsGenerated.end());
-			
+		for(int i = 0; i < permutationsGenerated.size(); i++){
+			printf("%s", permutationsGenerated[i]);
+		}	
 		Build << S;
 			
 		int a = S.find(" ") + 1;
@@ -202,7 +176,11 @@ void substringBuilder(std::vector<std::string> arrayString, int x);
 		std::regex re(" ");
 		std::sregex_token_iterator first{shortString.begin(), shortString.end(), re, -1}, last;//the '-1' is what makes the regex split (-1 := what was not matched)
 		std::vector<std::string> arrayString{first, last};
-
+		printf("Test5.1");
+		
+		for(int i= 0; i < arrayString.size(); i++){
+			printf("%s ", arrayString[i]);
+		}
 		//for loop skips over repeating substrings, only grabbing unique strings from original list of permutations.
 			
 		for (int i = 1, x = 1; i < arrayString.at(i).size(); i++, x = factorial(i), y = i){
@@ -218,7 +196,7 @@ void substringBuilder(std::vector<std::string> arrayString, int x);
 
 
 	void substringBuilder(std::vector<std::string> arrayString, int x){
-	        
+	        printf("Test6");
 		for (j = 1; j < arrayString.size(); j += x) {
 			            
 			Build << subString(arrayString.at(j), arrayString.at(0).size());
@@ -253,7 +231,7 @@ void substringBuilder(std::vector<std::string> arrayString, int x);
 
 	}
 
-	std::vector<char> putLetter(){
+	std::stringstream putLetter(){
 		        
 		return permutationsGenerated;
 
@@ -304,11 +282,8 @@ void substringBuilder(std::vector<std::string> arrayString, int x);
 
 int main(int argc, char * argv[]){
 
-
-	//finish driver code
-	//then recompile	
-		
-
+	
+	printf("Test1");
 	std::vector<char> charArray;
 
 	charArray.push_back('a');
@@ -317,10 +292,16 @@ int main(int argc, char * argv[]){
 	charArray.push_back('d');
 	charArray.push_back('e');		
 
+	std::string myC(charArray.begin(), charArray.end());
+
 	printf("Test1");	
 	takeLetter(charArray);
 	printf("Test2");
-	findPermutations(getString(), " ");
+	findPermutations(getString(), "");
+	printf("Test4");
+	
+	std::cout << permutationsGenerated.str();
+	std::cout << myC;
 	findAllSubstrings();
 	
 	printf("%s", TestCombo.c_str());		
