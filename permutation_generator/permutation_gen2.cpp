@@ -15,6 +15,7 @@
 #include <bits/stdc++.h>
 #include <map>
 #include <utility>
+#include <cctype>
 
 //serial code converted from java implementati
 // 	     
@@ -40,8 +41,14 @@ void CreateDictionary() {
 			
 	    		if( fgets (buffer , 40 , file) == NULL ) 
 				break;	
-				
-				wordDictionary.push_back(buffer);						
+                        std::string s(buffer);
+                        //s.erase( std::remove( s.begin(), s.end(), '\n'), s.end() );
+                        //if (!s.empty() and s[s.length()-1] == '\n')
+                        //   s.erase( s.length()-1 );
+                        s.clear();
+                        for (int i = 0 ; i < strlen(buffer); ++i)
+                          if (isalpha(buffer[i])) s += buffer[i];
+			wordDictionary.push_back(s);						
 				
 	     
 		}
@@ -83,36 +90,76 @@ void checkLetterSet(std::vector<char> Letters){
 			lmap.insert( std::pair<char, int>(it, 1) );
 		}		
 	}
+
+        std::vector< std::vector<std::string> > thread_results;
+        int nthreads = 1;
+
+#ifdef _OPENMP
+        #pragma omp parallel
+        #pragma omp single
+        {
+           nthreads = omp_get_num_threads();
+        }
+#endif
+
+        thread_results.resize( nthreads );
+
+        #pragma omp parallel
+        {
+           int thread_id = 0;
+#ifdef _OPENMP
+           thread_id = omp_get_num_threads();
+#endif
+        printf("%d %d\n", nthreads, thread_id);
 	
 	//OpenMp Implementation
-	for(auto& it : wordDictionary){
+	//for(auto& it : wordDictionary){
+	#pragma omp for
+	for(int i = 0; i < wordDictionary.size(); ++i) {
+                const auto& it = wordDictionary[i];
 		match = true;
 		dmap.clear();
-
+		//std::cout << "blah: " << it << std::endl;
 		for( auto& charIt : it){
-			it3 = lmap.find(charIt);
+			char myChar = charIt;
+				
+			it3 = lmap.find(myChar);
 			if(it3 != lmap.end()){
-				it4 = dmap.find(charIt);
+				it4 = dmap.find(myChar);
 				if(it4 != dmap.end()){
-					dmap.at(charIt) = dmap[charIt] + 1;
-					if((int)dmap.at(charIt) > (int)lmap.at(charIt)){
+					dmap.at(myChar) = dmap[myChar] + 1;
+					//std::cout<< dmap[myChar] << std::endl;
+					//std::cout<< lmap[myChar] << std::endl; 
+					if((int)dmap.at(myChar) > (int)lmap.at(myChar)){
 					match = false;
 					}		
 				} else {
-					dmap.insert( std::pair<char, int>(charIt, 1 ) );
+					dmap.insert( std::pair<char, int>(myChar, 1 ) );
 				}
 			} else {
-			//match = false;
+			match = false;
 			} 
+		
+			
 		}
-		int d = (int) dmap.at(charIt);
-		int l = (int) lmap.at(charIt);
-		if(l > d){
-		std::cout << it << std::endl;
-		results.push_back(it);
+		//if(it.compare("cab") == 0) {
+                // std::cout << "cab" << it << "\n";
+                // for (auto k : dmap) printf("%c: %d\n", k.first, k.second);
+                //}
+		if(match){
+		//std::cout << it << std::endl;
+		//results.push_back(it);
+		thread_results[thread_id].push_back(it);
 		}
 
 	}
+
+        } // end parallel
+
+        for (int i = 0; i < nthreads; ++i)
+            for (auto& j : thread_results[i])
+                results.push_back( j );
+
 	//test
 	for (auto& it : lmap){
 		std::cout << it.first << it.second << std::endl;
@@ -127,14 +174,15 @@ int main(int argc, char * argv[]){
 	CreateDictionary();
 	
 
-	std::vector<char> testL = { 'a', 'b', 'c', 'd', 'e'};
+	std::vector<char> testL = { 'h', 't', 'e'};
 	checkLetterSet(testL);
 
 	for(int i = 0 ; i < results.size() ; i++){
-		//std::cout << "test";
-		std::cout << results.at(i) << std::endl;
+		std::cout << results[i] << std::endl;
+	}	
+		std::cout << results.size() << std::endl;
 		
-	}
+	
 
 	return 1;
 			                                                                                                
