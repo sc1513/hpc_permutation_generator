@@ -42,10 +42,7 @@ void CreateDictionary() {
 	    		if( fgets (buffer , 40 , file) == NULL ) 
 				break;	
                         std::string s(buffer);
-                        //s.erase( std::remove( s.begin(), s.end(), '\n'), s.end() );
-                        //if (!s.empty() and s[s.length()-1] == '\n')
-                        //   s.erase( s.length()-1 );
-                        s.clear();
+                        s.clear(); //created a string variable in order to get rid of new line character. The character was causing issues with matching
                         for (int i = 0 ; i < strlen(buffer); ++i)
                           if (isalpha(buffer[i])) s += buffer[i];
 			wordDictionary.push_back(s);						
@@ -73,14 +70,14 @@ void runTests(int numOfLetters, int numOfWords){
 
 }
 
+//Checks for two requirements
+//1. All letters in a specific word are contained in the given set of letters.
+//2. The letters in a specific word have less instances of each letter than the given set of letters.
 void checkLetterSet(std::vector<char> Letters){
 
+	//Set up letters to be checked in lmap
 	std::map<char, int> lmap;
-	std::map<char, int> dmap;	
 	std::map<char, int>::iterator it2;
-	std::map<char, int>::iterator it3;
-	std::map<char, int>::iterator it4;
-	bool match {true};
 
 	for (auto& it : Letters){
 		it2 = lmap.find(it);
@@ -91,9 +88,11 @@ void checkLetterSet(std::vector<char> Letters){
 		}		
 	}
 
+	//Default number of threads 1, for serial case
         std::vector< std::vector<std::string> > thread_results;
         int nthreads = 1;
 
+//Get number of threads for OpenMp
 #ifdef _OPENMP
         #pragma omp parallel
         #pragma omp single
@@ -112,50 +111,61 @@ void checkLetterSet(std::vector<char> Letters){
 #endif
         printf("%d %d\n", nthreads, thread_id);
 	
-	//OpenMp Implementation
-	//for(auto& it : wordDictionary){
+	//loops through wordDictionary which is a vecor of strings.
+	//OpenMp Implementation on the outer loop
 	#pragma omp for
 	for(int i = 0; i < wordDictionary.size(); ++i) {
                 const auto& it = wordDictionary[i];
-		match = true;
+		
+		// initiate dmap and iterators, dmap keeps track of how many instances there are of each letter appearing in word of the dictionary.
+        	std::map<char, int> dmap;
+        	std::map<char, int>::iterator it3;
+        	std::map<char, int>::iterator it4;
+		// Checks requirement one and requirement two. Evaluates false if requirements are not met.
+		bool match {true};
 		dmap.clear();
-		//std::cout << "blah: " << it << std::endl;
+		
+		// Loops through each character in a word taken from the dictionary
 		for( auto& charIt : it){
-			char myChar = charIt;
-				
+			char myChar = charIt;				
 			it3 = lmap.find(myChar);
+
+			// Evaluates requirement one, does the dictionary word contain a letter that I do not have in my letter set
 			if(it3 != lmap.end()){
 				it4 = dmap.find(myChar);
+				
+				//add to my dmap
 				if(it4 != dmap.end()){
 					dmap.at(myChar) = dmap[myChar] + 1;
-					//std::cout<< dmap[myChar] << std::endl;
-					//std::cout<< lmap[myChar] << std::endl; 
+				
+					// Evaluate requirement two, does the dictionary word contain more instances of a given letter than i have in my letter set	 
 					if((int)dmap.at(myChar) > (int)lmap.at(myChar)){
 					match = false;
+
 					}		
 				} else {
 					dmap.insert( std::pair<char, int>(myChar, 1 ) );
+
 				}
 			} else {
 			match = false;
+
 			} 
-		
 			
 		}
-		//if(it.compare("cab") == 0) {
-                // std::cout << "cab" << it << "\n";
-                // for (auto k : dmap) printf("%c: %d\n", k.first, k.second);
-                //}
+		
+		//if both requirements are true then add to an array of results.
+		//This is done prevent multiple threads from accessing the same container.
+		//Race conditions
 		if(match){
-		//std::cout << it << std::endl;
-		//results.push_back(it);
-		thread_results[thread_id].push_back(it);
+			thread_results[thread_id].push_back(it);
 		}
 
 	}
 
         } // end parallel
 
+	//Take results and put them into a final results array.
         for (int i = 0; i < nthreads; ++i)
             for (auto& j : thread_results[i])
                 results.push_back( j );
@@ -174,7 +184,7 @@ int main(int argc, char * argv[]){
 	CreateDictionary();
 	
 
-	std::vector<char> testL = { 'h', 't', 'e'};
+	std::vector<char> testL = { 'h', 't', 'e', 't', 'e'};
 	checkLetterSet(testL);
 
 	for(int i = 0 ; i < results.size() ; i++){
