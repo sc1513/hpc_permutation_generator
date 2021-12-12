@@ -64,9 +64,19 @@ void CreateDictionary() {
 void runTests(int numOfLetters, int numOfWords){
 //seed random input for tests
 
+   	/* Run the step several times. */
+   	TimerType t_start = getTimeStamp();
+   	double t_checkLetterSet = 0;
+   	int flnum = 0;
+      	
+	/* 1. Compute the acceleration on each object. */
+      	TimerType t0 = getTimeStamp();
 
+      	checkLetterSet( );
 
+      	TimerType t1 = getTimeStamp();
 
+      	t_checkLetterSet += getElapsedTime(t0,t1);
 
 }
 
