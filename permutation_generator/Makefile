@@ -1,49 +1,33 @@
-COMMON	= ../common
+COMMON  = ../common
 
-#CXX	= icpc
-CXX    ?= g++
-CXXFLAGS= -O3 -I. -I$(COMMON)
-LDFLAGS	= -lrt
+DBG      ?=
+CXX      ?= g++
+OMPFLAGS ?= -fopenmp
+CXXFLAGS  = -O3 -I. -std=c++11 -I$(COMMON) $(DBG)
 
 ifeq ($(CXX),icpc)
-CXXFLAGS += -xHost #-no-vec
-CXXFLAGS += -qopt-report=5
-CXXFLAGS += -D__ALIGNMENT=32
+  CXXFLAGS += -xHost #-no-vec
+  CXXFLAGS += -qopt-report=5
+  CXXFLAGS += -Wunknown-pragmas -fopenmp # Disable warning about OpenMP pragma no defined.
 endif
 
 ifeq ($(CXX),g++)
-CXXFLAGS += -mtune=native
-CXXFLAGS += -march=skylake-avx512
-endif
-
-ifneq ($(restrict),)
-ifneq ($(restrict),0)
-CXXFLAGS += -D__RESTRICT=restrict -restrict
-endif
-endif
-
-ifneq ($(align),)
-ifneq ($(align),0)
-CXXFLAGS += -D__ALIGNMENT=$(align)
-endif
-endif
-
-ifneq ($(dtype),)
-ifneq ($(dtype),0)
-CXXFLAGS += -D__DTYPE=$(dtype)
-endif
+  CXXFLAGS += -mtune=native -march=native
 endif
 
 EXEC = permutation_gen2
 
 all: $(EXEC)
 
+# Load common make options
 include $(COMMON)/Makefile.common
+LDFLAGS   = $(COMMON_LIBS)
 
--include *.d
+permutation_gen2.o: permutation_gen2.cpp
+	$(CXX) $(CXXFLAGS) $(OMPFLAGS) -c permutation_gen2.cpp
 
 permutation_gen2: permutation_gen2.o $(COMMON_OBJS)
-	$(CXX) $(CXXFLAGS) -o permutation_gen2 $^ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(OMPFLAGS) -o permutation_gen2 permutation_gen2.o $(COMMON_OBJS) $(LDFLAGS)
 
-clean:
-	/bin/rm -fv $(EXEC) *.o *.optrpt *.d
+clean: clean_common
+	/bin/rm -fv $(EXEC) *.o *.optrpt *.d                                                 

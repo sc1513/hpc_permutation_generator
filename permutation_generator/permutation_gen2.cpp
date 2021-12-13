@@ -16,13 +16,18 @@
 #include <map>
 #include <utility>
 #include <cctype>
+#include <omp.h>
 
-//serial code converted from java implementati
-// 	     
+//#include <aligned_allocator.h>
+//#ifdef _OPENMP
+//#include <omp.h>
+//#endif
+
+//serial code  	     
 
 std::vector<std::string> wordDictionary;
 std::vector<std::string> results;
-
+int checkLetterSet(std::vector<char> Letters);
 
 //sets up dictionary
 void CreateDictionary() {
@@ -51,39 +56,36 @@ void CreateDictionary() {
 		}
 		fclose(file);
 	}
-	
-	//test
-	for(int i = 0; i < 50; i++){    
-               		
-		std::cout << wordDictionary.at(i);
-                                        
-	}
+
 
 }
 
-void runTests(int numOfLetters, int numOfWords){
+void runTests(std::vector<char> Letters){
 //seed random input for tests
 
    	/* Run the step several times. */
    	TimerType t_start = getTimeStamp();
    	double t_checkLetterSet = 0;
-   	int flnum = 0;
+   	int threads;
       	
 	/* 1. Compute the acceleration on each object. */
       	TimerType t0 = getTimeStamp();
 
-      	checkLetterSet( );
+      	threads = checkLetterSet(Letters);
 
       	TimerType t1 = getTimeStamp();
 
       	t_checkLetterSet += getElapsedTime(t0,t1);
-
+	printf("Results: %d words found in %f (ms), # of thread(s) used %d, # of Letters in data set %d.\n", results.size(), t_checkLetterSet*1000.0, threads, Letters.size());
+	//printf("Average time = %f (ms) per step with %d elements %.2f KB over %d steps %f %f %f\n", t_calc*1000.0/num_steps, n, nkbytes, num_steps, t_accel*1000/num_steps, t_update*1000/num_steps, t_search*1000/num_steps);
 }
+
+
 
 //Checks for two requirements
 //1. All letters in a specific word are contained in the given set of letters.
 //2. The letters in a specific word have less instances of each letter than the given set of letters.
-void checkLetterSet(std::vector<char> Letters){
+int checkLetterSet(std::vector<char> Letters){
 
 	//Set up letters to be checked in lmap
 	std::map<char, int> lmap;
@@ -117,7 +119,7 @@ void checkLetterSet(std::vector<char> Letters){
         {
            int thread_id = 0;
 #ifdef _OPENMP
-           thread_id = omp_get_num_threads();
+           thread_id = omp_get_thread_num();
 #endif
         printf("%d %d\n", nthreads, thread_id);
 	
@@ -180,29 +182,20 @@ void checkLetterSet(std::vector<char> Letters){
             for (auto& j : thread_results[i])
                 results.push_back( j );
 
-	//test
-	for (auto& it : lmap){
-		std::cout << it.first << it.second << std::endl;
-	}
-
-
+	std::cout << "test";
+	return nthreads;
 }
 	
 	
 int main(int argc, char * argv[]){
-	std::cout<< "test" << std::endl;
+	
+	//create dictionary to reference data
 	CreateDictionary();
 	
+	//letter set to reference against the dictionary
+	std::vector<char> testL = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
-	std::vector<char> testL = { 'h', 't', 'e', 't', 'e'};
-	checkLetterSet(testL);
-
-	for(int i = 0 ; i < results.size() ; i++){
-		std::cout << results[i] << std::endl;
-	}	
-		std::cout << results.size() << std::endl;
-		
-	
+	runTests(testL);		
 
 	return 1;
 			                                                                                                
