@@ -27,7 +27,9 @@
 
 std::vector<std::string> wordDictionary;
 std::vector<std::string> results;
-int checkLetterSet(std::vector<char> Letters);
+std::vector<std::vector<std::string>> checkLetterSet(std::vector<char> Letters);
+void consolidateResults(std::vector< std::vector<std::string> > thread_results);
+int threads;
 
 //sets up dictionary
 void CreateDictionary() {
@@ -66,17 +68,24 @@ void runTests(std::vector<char> Letters){
    	/* Run the step several times. */
    	TimerType t_start = getTimeStamp();
    	double t_checkLetterSet = 0;
-   	int threads;
+	double t_consolidateResults = 0;
+   	std::vector< std::vector<std::string> > threadsR;
       	
-	/* 1. Compute the acceleration on each object. */
+	/* 1. get time elapsed to find words from dictionary */
       	TimerType t0 = getTimeStamp();
-
-      	threads = checkLetterSet(Letters);
-
+      	threadsR = checkLetterSet(Letters);
       	TimerType t1 = getTimeStamp();
 
+	/* 2. get time elasped to concatonate results from multiple threads */
+	TimerType t2 = getTimeStamp();
+	consolidateResults(threadsR);
+	TimerType t3 = getTimeStamp();
+
+	/*3. Calculate time for both metrics */
       	t_checkLetterSet += getElapsedTime(t0,t1);
-	printf("Results: %d words found in %f (ms), # of thread(s) used %d, # of Letters in data set %d.\n", results.size(), t_checkLetterSet*1000.0, threads, Letters.size());
+	t_consolidateResults += getElapsedTime(t2,t3);
+
+	printf("Results: %d words found in %f (ms), %f (ms) to concatonate results, # of thread(s) used %d, # of Letters in data set %d.\n", results.size(), t_checkLetterSet*1000.0, t_consolidateResults*1000.0, threads, Letters.size());
 	//printf("Average time = %f (ms) per step with %d elements %.2f KB over %d steps %f %f %f\n", t_calc*1000.0/num_steps, n, nkbytes, num_steps, t_accel*1000/num_steps, t_update*1000/num_steps, t_search*1000/num_steps);
 }
 
@@ -85,7 +94,7 @@ void runTests(std::vector<char> Letters){
 //Checks for two requirements
 //1. All letters in a specific word are contained in the given set of letters.
 //2. The letters in a specific word have less instances of each letter than the given set of letters.
-int checkLetterSet(std::vector<char> Letters){
+std::vector< std::vector<std::string> > checkLetterSet(std::vector<char> Letters){
 
 	//Set up letters to be checked in lmap
 	std::map<char, int> lmap;
@@ -178,13 +187,23 @@ int checkLetterSet(std::vector<char> Letters){
         } // end parallel
 
 	//Take results and put them into a final results array.
-        for (int i = 0; i < nthreads; ++i)
+        //for (int i = 0; i < nthreads; ++i)
+        //    for (auto& j : thread_results[i])
+        //        results.push_back( j );
+	threads = nthreads;
+	std::cout << "test";
+	return thread_results; 
+}
+
+void consolidateResults(std::vector< std::vector<std::string> > thread_results){
+
+	//Take results and put them into a final results array.
+	for (int i = 0; i < thread_results.size(); ++i)
             for (auto& j : thread_results[i])
                 results.push_back( j );
 
-	std::cout << "test";
-	return nthreads;
 }
+
 	
 	
 int main(int argc, char * argv[]){
