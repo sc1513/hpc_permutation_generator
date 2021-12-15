@@ -191,6 +191,7 @@ std::vector< std::vector<std::string> > checkLetterSet(std::vector<char> Letters
 	
 	//loops through wordDictionary which is a vecor of strings.
 	//OpenMp Implementation on the outer loop
+	//Serial Runs on one Thread, #pragma omp for optimization, #pragma omp for schedul(dynamic) for load balancing.
 	#pragma omp for schedule(dynamic)
 	for(int i = 0; i < wordDictionary.size(); ++i) {
                 const auto& it = wordDictionary[i];
