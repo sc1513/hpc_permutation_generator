@@ -17,6 +17,7 @@
 #include <utility>
 #include <cctype>
 #include <omp.h>
+#include <cstring>
 
 //#include <aligned_allocator.h>
 //#ifdef _OPENMP
@@ -30,6 +31,18 @@ std::vector<std::string> results;
 std::vector<std::vector<std::string>> checkLetterSet(std::vector<char> Letters);
 void consolidateResults(std::vector< std::vector<std::string> > thread_results);
 int threads;
+
+
+
+
+void help(const char* prg) {
+   if (prg) fprintf(stderr,"%s:\n", prg);
+   fprintf(stderr,"\t--help | -h       : Print help message.\n");
+   fprintf(stderr,"\t--nparticles | -n : # of particles (5).\n");
+   fprintf(stderr,"\t--nsteps | -s     : # of steps to take (10).\n");
+ 
+}
+
 
 //sets up dictionary
 void CreateDictionary() {
@@ -62,31 +75,75 @@ void CreateDictionary() {
 
 }
 
-void runTests(std::vector<char> Letters){
+void runTests(int n, int num_steps){
 //seed random input for tests
-
+	printf("Benchmark for Scramble Word Search \n");
+	printf("Amount of Letters: %d \n", n);
+	printf("Number of Tests: %d \n", num_steps);
+	
    	/* Run the step several times. */
    	TimerType t_start = getTimeStamp();
    	double t_checkLetterSet = 0;
 	double t_consolidateResults = 0;
-   	std::vector< std::vector<std::string> > threadsR;
-      	
-	/* 1. get time elapsed to find words from dictionary */
-      	TimerType t0 = getTimeStamp();
-      	threadsR = checkLetterSet(Letters);
-      	TimerType t1 = getTimeStamp();
+   	double t_cls = 0;
+	double t_cr = 0;
+	std::vector< std::vector<std::string> > threadsR;
+	int wordsFoundPerTest = 0;      	
+	
+	std::vector<std::vector<char>> testWords;
+	testWords.reserve(num_steps);
+	std::vector<std::string> displayWords;
 
-	/* 2. get time elasped to concatonate results from multiple threads */
-	TimerType t2 = getTimeStamp();
-	consolidateResults(threadsR);
-	TimerType t3 = getTimeStamp();
+      	for (int i = 0; i < num_steps; i++)
+      	{
+         	std::vector<char> tWord;
+         	for (int k = 0; k < n; k++){
+			//Assign random set of characters (lower case)
+			char c = (char)(rand() % 26 + 97);
+			tWord.push_back(c);
+		} 
+		testWords.push_back(tWord);
+		std::string s(tWord.begin(), tWord.end());
+		displayWords.push_back(s);
+            	tWord.clear();	
+      	}
+   	
+	
+	printf("Letters | Words Found | Search Time | Concatonate Time \n");
+	for (int i = 0; i < num_steps; i++){
 
-	/*3. Calculate time for both metrics */
-      	t_checkLetterSet += getElapsedTime(t0,t1);
-	t_consolidateResults += getElapsedTime(t2,t3);
+		/* 1. get time elapsed to find words from dictionary */
+      		TimerType t0 = getTimeStamp();
+      		threadsR = checkLetterSet(testWords[i]);
+      		TimerType t1 = getTimeStamp();
 
-	printf("Results: %d words found in %f (ms), %f (ms) to concatonate results, # of thread(s) used %d, # of Letters in data set %d.\n", results.size(), t_checkLetterSet*1000.0, t_consolidateResults*1000.0, threads, Letters.size());
-	//printf("Average time = %f (ms) per step with %d elements %.2f KB over %d steps %f %f %f\n", t_calc*1000.0/num_steps, n, nkbytes, num_steps, t_accel*1000/num_steps, t_update*1000/num_steps, t_search*1000/num_steps);
+		/* 2. get time elasped to concatonate results from multiple threads */
+		TimerType t2 = getTimeStamp();
+		consolidateResults(threadsR);
+		TimerType t3 = getTimeStamp();
+
+		/*3. Calculate time for both metrics */
+      		t_checkLetterSet += getElapsedTime(t0,t1);
+		t_consolidateResults += getElapsedTime(t2,t3);
+		
+		//find time and words per trial
+		wordsFoundPerTest = results.size() - wordsFoundPerTest;
+		t_cls = t_checkLetterSet - t_cls;
+		t_cr = t_consolidateResults - t_cr;
+		std::cout << displayWords[i] << " ";
+		printf("| %d | %f (ms) | %f (ms) \n", wordsFoundPerTest, t_cls*1000.0, t_cr*1000.0);
+		//printf("Average time = %f (ms) per step with %d elements %.2f KB over %d steps %f %f %f\n", t_calc*1000.0/num_steps, n, nkbytes, num_steps, t_accel*1000/num_steps, t_update*1000/num_steps, t_search*1000/num_steps);
+		
+		wordsFoundPerTest = results.size();
+		t_cls = t_checkLetterSet;
+		t_cr = t_consolidateResults;
+
+	}	
+
+	printf("AVG Number of words found: %d, AVG time to find words %f (ms), AVG time to concatonate words %f (ms), Number of thread(s) used %d, # of Letters in data set %d. # of words tested %d.\n", results.size()/num_steps, t_checkLetterSet*1000.0/num_steps, t_consolidateResults*1000.0/num_steps, threads, n, num_steps);
+
+
+
 }
 
 
@@ -130,11 +187,11 @@ std::vector< std::vector<std::string> > checkLetterSet(std::vector<char> Letters
 #ifdef _OPENMP
            thread_id = omp_get_thread_num();
 #endif
-        printf("%d %d\n", nthreads, thread_id);
+        //printf("%d %d\n", nthreads, thread_id);
 	
 	//loops through wordDictionary which is a vecor of strings.
 	//OpenMp Implementation on the outer loop
-	#pragma omp for
+	#pragma omp for schedule(dynamic)
 	for(int i = 0; i < wordDictionary.size(); ++i) {
                 const auto& it = wordDictionary[i];
 		
@@ -191,7 +248,7 @@ std::vector< std::vector<std::string> > checkLetterSet(std::vector<char> Letters
         //    for (auto& j : thread_results[i])
         //        results.push_back( j );
 	threads = nthreads;
-	std::cout << "test";
+	//std::cout << "test";	
 	return thread_results; 
 }
 
@@ -208,13 +265,51 @@ void consolidateResults(std::vector< std::vector<std::string> > thread_results){
 	
 int main(int argc, char * argv[]){
 	
+	int n = 5;
+
+  	int num_steps = 10;
+
+	for (int i = 1; i < argc; ++i)
+  	{
+#define check_index(i,str) \
+   	if ((i) >= argc) \
+      	{ fprintf(stderr,"Missing 2nd argument for %s\n", str); help(argv[0]); return 1; }
+
+      	if ( strcmp(argv[i],"-h") == 0 || strcmp(argv[i],"--help") == 0)
+      	{
+         	help(argv[0]);
+         	return 0;
+      	}
+      	else if (strcmp(argv[i],"--nparticles") == 0 || strcmp(argv[i],"-n") == 0)
+      	{
+         	check_index(i+1,"--nparticles|-n");
+         	i++;
+         	if (not(isdigit(*argv[i])))
+            	{ fprintf(stderr,"Invalid value for option \"--particles\" %s\n", argv[i]); help(argv[0]); return 1; }
+         	n = atoi( argv[i] );
+      	}
+      	else if (strcmp(argv[i],"--nsteps") == 0 || strcmp(argv[i],"-s") == 0)
+      	{
+         	check_index(i+1,"--nsteps|-s");
+         	i++;
+         	if (not(isdigit(*argv[i])))
+            	{ fprintf(stderr,"Invalid value for option \"--nsteps\" %s\n", argv[i]); help(argv[0]); return 1; }
+         	num_steps = atoi( argv[i] );
+      	}
+      	else
+      	{
+         	fprintf(stderr,"Unknown option %s\n", argv[i]);
+         	help(argv[0]);
+         	return 1;
+      	}
+   	}
 	//create dictionary to reference data
 	CreateDictionary();
 	
 	//letter set to reference against the dictionary
 	std::vector<char> testL = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
-	runTests(testL);		
+	runTests(n, num_steps);		
 
 	return 1;
 			                                                                                                
