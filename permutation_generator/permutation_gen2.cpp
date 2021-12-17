@@ -140,8 +140,11 @@ void runTests(int n, int num_steps){
 
 	}	
 
-	printf("AVG Number of words found: %d, AVG time to find words %f (ms), AVG time to concatonate words %f (ms), Number of thread(s) used %d, # of Letters in data set %d. # of words tested %d.\n", results.size()/num_steps, t_checkLetterSet*1000.0/num_steps, t_consolidateResults*1000.0/num_steps, threads, n, num_steps);
-
+	printf("AVG Number of words found: %1ld, AVG time to find words %f (ms), AVG time to concatonate words %f (ms), Number of thread(s) used %d, # of Letters in data set %d. # of words tested %d.\n", results.size()/num_steps, t_checkLetterSet*1000.0/num_steps, t_consolidateResults*1000.0/num_steps, threads, n, num_steps);
+	
+	for(int i = 0; i < results.size(); i++){
+		std::cout << results[i] << " ";
+	}
 
 
 }
@@ -260,6 +263,9 @@ void consolidateResults(std::vector< std::vector<std::string> > thread_results){
             for (auto& j : thread_results[i])
                 results.push_back( j );
 
+
+	std::sort(results.begin(), results.end());
+
 }
 
 	
@@ -308,7 +314,7 @@ int main(int argc, char * argv[]){
 	CreateDictionary();
 	
 	//letter set to reference against the dictionary
-	std::vector<char> testL = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+	//std::vector<char> testL = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
 	runTests(n, num_steps);		
 
