@@ -223,7 +223,7 @@ std::vector< std::vector<std::string> > checkLetterSet(std::vector<char> Letters
 					// Evaluate requirement two, does the dictionary word contain more instances of a given letter than i have in my letter set	 
 					if((int)dmap.at(myChar) > (int)lmap.at(myChar)){
 					match = false;
-
+					continue;
 					}		
 				} else {
 					dmap.insert( std::pair<char, int>(myChar, 1 ) );
@@ -231,7 +231,7 @@ std::vector< std::vector<std::string> > checkLetterSet(std::vector<char> Letters
 				}
 			} else {
 			match = false;
-
+			continue;
 			} 
 			
 		}
