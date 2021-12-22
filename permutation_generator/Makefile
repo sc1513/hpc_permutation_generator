@@ -15,7 +15,7 @@ ifeq ($(CXX),g++)
   CXXFLAGS += -mtune=native -march=native
 endif
 
-EXEC = permutation_gen2
+EXEC = permutation_gen3
 
 all: $(EXEC)
 
@@ -23,11 +23,11 @@ all: $(EXEC)
 include $(COMMON)/Makefile.common
 LDFLAGS   = $(COMMON_LIBS)
 
-permutation_gen2.o: permutation_gen2.cpp
-	$(CXX) $(CXXFLAGS) $(OMPFLAGS) -c permutation_gen2.cpp
+permutation_gen3.o: permutation_gen3.cpp
+	$(CXX) $(CXXFLAGS) $(OMPFLAGS) -c permutation_gen3.cpp
 
-permutation_gen2: permutation_gen2.o $(COMMON_OBJS)
-	$(CXX) $(CXXFLAGS) $(OMPFLAGS) -o permutation_gen2 permutation_gen2.o $(COMMON_OBJS) $(LDFLAGS)
+permutation_gen3: permutation_gen3.o $(COMMON_OBJS)
+	$(CXX) $(CXXFLAGS) $(OMPFLAGS) -o permutation_gen3 permutation_gen3.o $(COMMON_OBJS) $(LDFLAGS)
 
 clean: clean_common
 	/bin/rm -fv $(EXEC) *.o *.optrpt *.d                                                 
