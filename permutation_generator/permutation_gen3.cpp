@@ -22,9 +22,7 @@
 //#include <aligned_allocator.h>
 //#ifdef _OPENMP
 //#include <omp.h>
-//#endif
-
-//serial code  	     
+//#endif  	     
 
 std::vector<std::string> wordDictionary;
 std::vector<std::string> results;
@@ -49,7 +47,7 @@ void CreateDictionary() {
      	char buffer[B];
 	int i= 0;
 
-	file = fopen("../dict4", "r");
+	file = fopen("../dictionary/dict4", "r");
 
 	if (file == NULL) perror ("Error opening file");   
 	else{		        
@@ -128,9 +126,14 @@ void runTests(int n, int num_steps){
 		t_cls = t_checkLetterSet - t_cls;
 		t_cr = t_consolidateResults - t_cr;
 		std::cout << displayWords[i] << " ";
-		printf("| %d | %f (ms) | %f (ms) \n", wordsFoundPerTest, t_cls*1000.0, t_cr*1000.0);
-		//printf("Average time = %f (ms) per step with %d elements %.2f KB over %d steps %f %f %f\n", t_calc*1000.0/num_steps, n, nkbytes, num_steps, t_accel*1000/num_steps, t_update*1000/num_steps, t_search*1000/num_steps);
+		printf("| %d | %f (ms) | %f (ms)", wordsFoundPerTest, t_cls*1000.0, t_cr*1000.0);
+		//printf("Average time = %f (ms) per step with %d elements %.2f KB over %d steps %f %f %f", t_calc*1000.0/num_steps, n, nkbytes, num_steps, t_accel*1000/num_steps, t_update*1000/num_steps, t_search*1000/num_steps);
+		std::cout<< " Results: ";
 		
+		for(int i = results.size() - wordsFoundPerTest; i < results.size(); i++){
+			std::cout << results[i] << " ";
+		}
+		std::cout << std::endl << std::endl;
 		wordsFoundPerTest = results.size();
 		t_cls = t_checkLetterSet;
 		t_cr = t_consolidateResults;
@@ -139,9 +142,9 @@ void runTests(int n, int num_steps){
 
 	printf("AVG Number of words found: %1ld, AVG time to find words %f (ms), AVG time to concatonate words %f (ms), Number of thread(s) used %d, # of Letters in data set %d. # of words tested %d.\n", results.size()/num_steps, t_checkLetterSet*1000.0/num_steps, t_consolidateResults*1000.0/num_steps, threads, n, num_steps);
 	
-	for(int i = 0; i < results.size(); i++){
-		std::cout << results[i] << " ";
-	}
+	//for(int i = 0; i < results.size(); i++){
+	//	std::cout << results[i] << " ";
+	//}
 
 
 }
@@ -278,7 +281,7 @@ void consolidateResults(std::vector< std::vector<std::string> > thread_results){
                 results.push_back( j );
 
 
-	std::sort(results.begin(), results.end());
+	//std::sort(results.begin(), results.end());
 
 }
 
