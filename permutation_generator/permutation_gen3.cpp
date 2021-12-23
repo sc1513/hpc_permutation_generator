@@ -32,9 +32,6 @@ std::vector<std::vector<std::string>> checkLetterSet(std::vector<char> Letters);
 void consolidateResults(std::vector< std::vector<std::string> > thread_results);
 int threads;
 
-
-
-
 void help(const char* prg) {
    if (prg) fprintf(stderr,"%s:\n", prg);
    fprintf(stderr,"\t--help | -h       : Print help message.\n");
@@ -42,26 +39,6 @@ void help(const char* prg) {
    fprintf(stderr,"\t--nsteps | -s     : # of steps to take (10).\n");
  
 }
-
-int getIndex(char c, std::vector<char> lmap){
-	
-	auto it = find(lmap.begin(), lmap.end(), c);
-	 
-	if (it != lmap.end())
-	{	                  	
-		                        
-	int index = it - lmap.begin();	                                              
-	return index;
-	                                                      
-	}else {
-	 	                        
-	return -1;
-
-	}
-
-
-}
-
 
 //sets up dictionary
 void CreateDictionary() {
@@ -72,7 +49,7 @@ void CreateDictionary() {
      	char buffer[B];
 	int i= 0;
 
-	file = fopen("../dictionary2.txt", "r");
+	file = fopen("../dict4", "r");
 
 	if (file == NULL) perror ("Error opening file");   
 	else{		        
@@ -83,9 +60,10 @@ void CreateDictionary() {
                         std::string s(buffer);
                         s.clear(); //created a string variable in order to get rid of new line character. The character was causing issues with matching
                         for (int i = 0 ; i < strlen(buffer); ++i)
-                          if (isalpha(buffer[i])) s += buffer[i];
-			wordDictionary.push_back(s);						
-				
+                          	if (isalpha(buffer[i]))
+				  	s += buffer[i];
+			
+			wordDictionary.push_back(s);			
 	     
 		}
 		fclose(file);
@@ -175,17 +153,16 @@ void runTests(int n, int num_steps){
 //2. The letters in a specific word have less instances of each letter than the given set of letters.
 std::vector< std::vector<std::string> > checkLetterSet(std::vector<char> Letters){
 
-	//Set up letters to be checked in lmap
-	//std::map<char, int> lmap;
-	//std::map<char, int>::iterator it2;
-	int it2;
+	//Set up letters in lmap 	
 	std::vector<char> lmap;
 	std::vector<int> lIndex;
 	int i = 0;
 	for (auto& it : Letters){
-		it2 = getIndex(it, lmap);
-		if(it2 != -1){
-			lIndex[it2] += 1;
+		auto it2 = find(lmap.begin(), lmap.end(), it);
+			
+		if(it2 != lmap.end()){
+			int index = it2 - lmap.begin();
+			lIndex[index] += 1;
 		} else {
 			lmap.push_back(it);
 			lIndex.push_back(1);
@@ -350,9 +327,6 @@ int main(int argc, char * argv[]){
 	//create dictionary to reference data
 	CreateDictionary();
 	
-	//letter set to reference against the dictionary
-	//std::vector<char> testL = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-
 	runTests(n, num_steps);		
 
 	return 1;
