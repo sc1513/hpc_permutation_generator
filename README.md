@@ -1,5 +1,5 @@
 # hpc_permutation_generator
-Optimizing serial code of a permutation generator using parallelism.
+Optimizing serial code of a permutation generator using openmp.
 
 The serial program generates random string input from a to z and checks an internal dictionary to out put all possible words that can be created from the set of characters. The program is desinged to capture time stamps to determine the speed up and efficiency of using OpenMp with various amount of threads.
 
