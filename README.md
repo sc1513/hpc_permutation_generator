@@ -30,32 +30,3 @@ Use command line arguments to change amount of characters being used and the qua
 ./performance_gen3 -n 15 -s 50
 
 These command arguments specify a random set of 15 characters while conducting 50 tests.
-
-The benchmarking below was taken on Stampede2 using Knights Landing compute nodes.
-
-Glossary
-TWF = Total Words Found	 
-FW = Found Words in (ms)	 
-CW = Concatenate Words in (ms)
-
-OpenMP Implementation
-Num. of Threads	AVG. TWF	AVG. FW(ms)	SpeedUp	Eff	AVG. CW(ms)	SpeedUp	Eff
-1	245	101.608871	1	100%	0.06063	1	100%
-2	249	80.522662	1.2618668	63%	0.077974	0.777567	39%
-4	208	52.225614	1.9455754	49%	0.06952	0.872123	22%
-8	354	35.326596	2.8762712	36%	0.10367	0.584837	7%
-16	224	21.728243	4.6763501	29%	0.0677	0.895569	6%
-32	221	13.680162	7.4274611	23%	0.068427	0.886054	3%
-64	301	8.495933	11.959707	19%	0.101613	0.596676	1%
-
-OpenMP Implementation with schedule(dynamic) for load balancing
-Num. of Threads	AVG. TR	AVG. FW(ms)	SpeedUp	Eff	AVG. CW(ms)	SpeedUp	Eff
-1	265	109.777989	1	100%	0.074374	1	100%
-2	219	88.63366	1.2385587	62%	0.07111	1.045901	52%
-4	268	51.601954	2.1273998	53%	0.082141	0.905443	23%
-8	336	29.983378	3.6612949	46%	0.114937	0.647085	8%
-16	321	20.091481	5.4639073	34%	0.093387	0.796406	5%
-32	274	16.175658	6.7866166	21%	0.096865	0.767811	2%
-64	253	12.041209	9.1168577	14%	0.119098	0.624477	1%
-
-
