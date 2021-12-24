@@ -39,7 +39,7 @@ FW = Found Words in (ms)
 CW = Concatenate Words in (ms)
 
 OpenMP Implementation
-# of Threads	AVG. TWF	AVG. FW (ms)	SpeedUp	Eff	AVG. CW (ms)	SpeedUp	Eff
+Num. of Threads	AVG. TWF	AVG. FW(ms)	SpeedUp	Eff	AVG. CW(ms)	SpeedUp	Eff
 1	245	101.608871	1	100%	0.06063	1	100%
 2	249	80.522662	1.2618668	63%	0.077974	0.777567	39%
 4	208	52.225614	1.9455754	49%	0.06952	0.872123	22%
@@ -49,7 +49,7 @@ OpenMP Implementation
 64	301	8.495933	11.959707	19%	0.101613	0.596676	1%
 
 OpenMP Implementation with schedule(dynamic) for load balancing
-# of Threads	AVG. TR	AVG. FW (ms)	SpeedUp	Eff	AVG. CW (ms)	SpeedUp	Eff
+Num. of Threads	AVG. TR	AVG. FW(ms)	SpeedUp	Eff	AVG. CW(ms)	SpeedUp	Eff
 1	265	109.777989	1	100%	0.074374	1	100%
 2	219	88.63366	1.2385587	62%	0.07111	1.045901	52%
 4	268	51.601954	2.1273998	53%	0.082141	0.905443	23%
